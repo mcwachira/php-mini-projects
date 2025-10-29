@@ -65,6 +65,12 @@ function badRequest(string $message = 'Bad Request'): void {
     exit;
 }
 
+function serverError(string $message = 'Server Error'):void{
+    http_response_code(500);
+    echo $message;
+    exit;
+
+}
 /**
  * Main router function.
  * Decides which route file to load based on URI + method

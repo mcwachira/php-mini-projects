@@ -18,5 +18,18 @@ if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
 }
 
 
-connectDb();
+$inserted = insertMessage(connectDb(),
+    name:$name,
+email:$email,
+message:$message
+);
+
+if($inserted){
+    $safeName = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+    echo "Thank you , $safeName , for your message. It was stored.";
+    exit;
+}
+
+serverError('Could not store the message. sorry');
+
 var_dump($name, $email, $message);
