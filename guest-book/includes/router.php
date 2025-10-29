@@ -1,63 +1,103 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Allowed HTTP methods
+ */
 const ALLOWED_METHODS = ['GET', 'POST'];
+
+/**
+ * When the URI is empty ("/"), treat it as "index"
+ */
 const INDEX_URI = '';
 const INDEX_ROUTE = 'index';
 
-function normalizeUri(string $uri): string{
+/**
+ * Normalizes the URI:
+ * - Removes query strings
+ * - Removes the base folder (e.g. "/guest-book/public")
+ * - Converts to lowercase
+ * - Removes leading/trailing slashes
+ * - Converts "" to "index"
+ */
+function normalizeUri(string $uri): string {
+
+    // Remove query string and keep only path
     $uri = parse_url($uri, PHP_URL_PATH);
+
+    // Convert to lowercase
     $uri = strtolower($uri);
 
-    // Determine the base directory (e.g. "/guest-book/public")
-    $scriptName = dirname($_SERVER['SCRIPT_NAME']);
-    if ($scriptName !== '/' && str_starts_with($uri, $scriptName)) {
-        $uri = substr($uri, strlen($scriptName));
+    // Detect base path (e.g. "/guest-book/public")
+    $basePath = dirname($_SERVER['SCRIPT_NAME']);
+
+    // Remove base path from URI
+    if ($basePath !== '/' && str_starts_with($uri, $basePath)) {
+        $uri = substr($uri, strlen($basePath));
     }
 
-    // Trim slashes
+    // Remove leading/trailing slashes
     $uri = trim($uri, '/');
 
-    return $uri === INDEX_URI ? INDEX_ROUTE : $uri;
+    // Convert empty string → "index"
+    return $uri === '' ? INDEX_ROUTE : $uri;
 }
 
+/**
+ * Builds the full path to the route file.
+ */
 function getFilePath(string $uri, string $method): string {
-    return ROUTES_DIR . '/' . normalizeUri($uri) . '_' . strtolower($method) . '.php';
+    return ROUTES_DIR . '/' . $uri . '_' . strtolower($method) . '.php';
 }
-function notFound():void{
+
+/**
+ * Sends a 404 error message and stops execution
+ */
+function notFound(): void {
     http_response_code(404);
     echo '404 Not Found';
     exit;
 }
-function dispatch(string $uri, string $method)
-{
 
-    //1. normalize the URI: GET /guestbook -> routes/guestbook_get.php
+/**
+ * Main router function.
+ * Decides which route file to load based on URI + method
+ */
+function dispatch(string $uri, string $method) {
+
+    // Normalize URI (remove base path, lowercase, "/ → index")
     $uri = normalizeUri($uri);
+
+    // Normalize HTTP method (GET, POST)
     $method = strtoupper($method);
 
-//    echo "<pre>";
-//    echo "URI: $uri\n";
-//    echo "Method: $method\n";
-//    echo "File path: " . getFilePath($uri, $method) . "\n";
-//    echo "</pre>";
+    // DEBUG OUTPUT — remove when finished testing
+    echo "<pre style='background:#222;color:#0f0;padding:10px'>";
+    echo "=== DEBUG ROUTER ===\n";
+    echo "REQUEST_URI: " . $_SERVER['REQUEST_URI'] . "\n";
+    echo "SCRIPT_NAME: " . $_SERVER['SCRIPT_NAME'] . "\n";
+    echo "BASE PATH: " . dirname($_SERVER['SCRIPT_NAME']) . "\n";
+    echo "Normalized URI: " . $uri . "\n";
+    echo "HTTP Method: " . $method . "\n";
+    echo "ROUTE FILE CHECK:\n";
+    echo getFilePath($uri, $method) . "\n";
+    echo "File exists? " . (file_exists(getFilePath($uri, $method)) ? "YES ✅" : "NO ❌") . "\n";
+    echo "</pre>";
+    // END DEBUG
 
-    //2. GET|POST - return 404
-    if(!in_array($method, ALLOWED_METHODS)){
-notFound();
+    // If method not supported → 404
+    if (!in_array($method, ALLOWED_METHODS)) {
+        notFound();
     }
 
-    //3. file path -PHP file path
+    // Try loading the route
+    $filePath = getFilePath($uri, $method);
 
-   $filePath = getFilePath($uri, $method);
-
-    if(file_exists($filePath)){
+    if (file_exists($filePath)) {
         include $filePath;
         return;
     }
 
+    // Route not found → 404
     notFound();
-    //4. if this file exist , if not 404
-    //5. Handle the route by including the PHP file
-
 }
