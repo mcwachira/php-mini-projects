@@ -114,12 +114,8 @@
 </header>
 
 <nav>
-    <a href="/">
-        Home
-    </a>
-    <a href="/contact">
-        Contact Form
-    </a>
+    <a href="/guest-book/public/">Home</a>
+    <a href="/guest-book/public/contact">Contact Form</a>
 </nav>
 
 <main>
