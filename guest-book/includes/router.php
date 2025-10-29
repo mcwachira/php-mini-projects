@@ -59,6 +59,12 @@ function notFound(): void {
     exit;
 }
 
+function badRequest(string $message = 'Bad Request'): void {
+    http_response_code(400);
+    echo $message;
+    exit;
+}
+
 /**
  * Main router function.
  * Decides which route file to load based on URI + method
