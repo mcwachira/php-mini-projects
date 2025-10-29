@@ -17,4 +17,6 @@ if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
     badRequest("Email Field is required");
 }
 
+
+connectDb();
 var_dump($name, $email, $message);
