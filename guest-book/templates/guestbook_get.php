@@ -1,5 +1,24 @@
 <?php
 
+function obfuscateName(string $name) :string{
+    if(strlen($name) <=2){
+        return $name;
+    }
+
+    return substr($name, 0, 1) . str_repeat('*', strlen($name) - 2) . substr($name, -1);
+}
+
+function obfuscateEmail(string $email) :string{
+ $parts = explode('@', $email);
+ $username = $parts[0];
+ $domain = $parts[1] ?? "";
+
+ $username = substr($username, 0, 2) . str_repeat('*', max(0 , strlen($username) - 2));
+
+ return "$username@$domain";
+}
+
+
 $messages = $data['messages'];
 //var_dump($messages);
 
@@ -19,10 +38,10 @@ $messages = $data['messages'];
     <?php foreach($messages as $message) : ?>
 
         <h3>
-            <?=htmlspecialchars($message['name'])?>
+            <?=obfuscateName(htmlspecialchars($message['name']))?>
         </h3>
             <p>
-                <?=htmlspecialchars($message['email'])?>
+                <?=obfuscateEmail(htmlspecialchars($message['email']))?>
             </p>
 
             <p>
