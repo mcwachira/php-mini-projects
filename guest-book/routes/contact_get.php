@@ -1,3 +1,3 @@
 <?php
 
-renderView('contact_get');
+renderView('contact_get', ['csrfToken' => getCurrentCsrfToken()]);

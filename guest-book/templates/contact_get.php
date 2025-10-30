@@ -7,6 +7,8 @@
     <form method="POST">
         <!-- CSRF -->
 
+        <input type="hidden" name="csrfToken" value="<?=$data['csrfToken']?>" />
+
         <label for="name">
             Name
         </label>

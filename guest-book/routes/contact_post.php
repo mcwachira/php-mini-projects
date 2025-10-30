@@ -1,5 +1,14 @@
 <?php
-//CSRF
+
+
+//CSRF protection
+if(!validateCsrfToken($_POST['csrfToken'] ?? null)){
+    addFlashMessage('error', 'Sorry , please send the  form again,');
+    redirect('/guest-book/public/contact');
+}
+
+
+
 $name =$_POST["name"] ?? "";
 $email =$_POST["email"] ?? "";
 $message =$_POST["message"] ?? "";
@@ -26,10 +35,12 @@ message:$message
 
 if($inserted){
     $safeName = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
-    echo "Thank you , $safeName , for your message. It was stored.";
-    exit;
+
+    addFlashMessage("success","Thank you , $safeName , for your message. It was stored." );
+    redirect("/guestbook/public/guestbook");
 }
 
-serverError('Could not store the message. sorry');
+addFlashMessage('error', 'Could not store the message. sorry');
 
-var_dump($name, $email, $message);
+redirect('/guest-book/public/contact');
+//var_dump($name, $email, $message);

@@ -71,6 +71,11 @@ function serverError(string $message = 'Server Error'):void{
     exit;
 
 }
+
+function redirect(string $uri): void {
+    header("Location: $uri");
+    exit();
+}
 /**
  * Main router function.
  * Decides which route file to load based on URI + method
