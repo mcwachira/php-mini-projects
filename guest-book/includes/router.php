@@ -22,6 +22,7 @@ const INDEX_ROUTE = 'index';
  */
 function normalizeUri(string $uri): string {
 
+    $uri = strtok($uri, '?');
     // Remove query string and keep only path
     $uri = parse_url($uri, PHP_URL_PATH);
 
